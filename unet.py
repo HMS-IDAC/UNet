@@ -185,7 +185,7 @@ with tf.name_scope('lt'):
 
 
 # --------------------------------------------------
-# final (top) layer
+# upsampling
 # --------------------------------------------------
 
 with tf.name_scope('upsampling'):
