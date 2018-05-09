@@ -43,7 +43,7 @@ dsfX = [dsf0, dsf1, dsf2]
 nlayers = len(dsfX)
 
 
-impath = '/home/mc457/Images/Workspace/DH_NBCB'
+impath = '/home/mc457/Workspace/DH_NBCB'
 
 train_writer_path = '/home/mc457/Workspace/TFLog/UNet/Train'
 valid_writer_path = '/home/mc457/Workspace/TFLog/UNet/Valid'
