@@ -19,7 +19,7 @@ nsteps = 10#000
 batchsize = 4
 nextraconvs = 1
 
-restore_variables = True#False
+restore_variables = False
 
 ks = 3
 nout0 = 16
