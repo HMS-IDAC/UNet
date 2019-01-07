@@ -1,12 +1,13 @@
 A TensorFlow implementation of the U-Net architecture for pixel classification (image segmentation).
 
-For a sample dataset to test the code on, see https://www.dropbox.com/s/50qmxl2rco6169e/DH_NBCB.zip?dl=0
+For a sample dataset to test the code on, see https://www.dropbox.com/s/rl3f4e3sjsosh5e/UNetData_Sinem.zip?dl=0
 
-See "setup" section of the script unet.py for parameters/hyperparameters to set.
+See main script on UNet2D.py for examples on how to train and deploy a model.
 
 
-Reference:
-    https://arxiv.org/abs/1505.04597
+References:
+    https://arxiv.org/abs/1505.04597 (original U-Net paper)
+    https://www.biorxiv.org/content/early/2018/12/28/507566 (paper where this implementation is used)
 
 Developed by:
     Marcelo Cicconet

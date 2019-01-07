@@ -6,10 +6,9 @@ import scipy.io as sio
 import os
 
 import sys
-sys.path.insert(0, '/home/mc457/Documents/Python/ImageScience')
-from toolbox.imtools import *
-from toolbox.ftools import *
-from toolbox.PartitionOfImage import PI2D
+from imtools import *
+from ftools import *
+from PartitionOfImage import PI2D
 
 
 def concat3(lst):
@@ -509,81 +508,27 @@ class UNet2D:
 
 if __name__ == '__main__':
     logPath = '/home/mc457/Workspace/TFLog/UNet2D'
-    modelPath = '/home/mc457/Workspace/TFModel/UNet2D_Sinem'
+    modelPath = '/home/mc457/Workspace/UNetData_Sinem/TFModel/UNet2D_Sinem'
     pmPath = '/home/mc457/Workspace/TFProbMaps/UNet2D'
 
-    
-    # ----- test 1 -----
 
-    # imPath = '/home/mc457/files/CellBiology/IDAC/Marcelo/Etc/UNetTestSets/SinemSaka_NucleiSegmentation'
+    # -------------------------
+    # train/test
+
+    # imPath = '/home/mc457/Workspace/UNetData_Sinem/TrainingData/NucleiSegmentation'
     # UNet2D.setup(128,1,2,8,2,2,3,1,0.1,2,8)
     # UNet2D.train(imPath,logPath,modelPath,pmPath,500,100,40,False,20000,1,0)
     # UNet2D.deploy(imPath,100,modelPath,pmPath,1,0)
 
-    I = im2double(tifread('/home/mc457/files/CellBiology/IDAC/Marcelo/Etc/UNetTestSets/SinemSaka_NucleiSegmentation_SingleImageInferenceTest4.tif'))
-    # I = im2double(tifread('/home/mc457/Workspace/NucImage34.tif'))
+
+    # -------------------------
+    # deploy in single image
+
+    I = im2double(tifread('/home/mc457/Workspace/UNetData_Sinem/SingleImageInferenceTest.tif'))
     UNet2D.singleImageInferenceSetup(modelPath,0)
     J = UNet2D.singleImageInference(I,'accumulate',0)
     UNet2D.singleImageInferenceCleanup()
-    # imshowlist([I,J])
-    # sys.exit(0)
-    # tifwrite(np.uint8(255*I),'/home/mc457/Workspace/I1.tif')
-    # tifwrite(np.uint8(255*J),'/home/mc457/Workspace/I2.tif')
     K = np.zeros((2,I.shape[0],I.shape[1]))
     K[0,:,:] = I
     K[1,:,:] = J
-    tifwrite(np.uint8(255*K),'/home/mc457/Workspace/Sinem_NucSeg.tif')
-
-
-    # UNet2D.singleImageInferenceSetup(modelPath,0)
-    # for i in range(3):
-    #     print(i)
-    #     I = im2double(tifread('/home/mc457/files/CellBiology/IDAC/Marcelo/Etc/UNetTestSets/SinemSaka_NucleiSegmentation_SingleImageInferenceTest%d.tif' % (i+1)))
-    #     J = UNet2D.singleImageInference(I,'accumulate',0)
-    #     K = np.zeros((2,I.shape[0],I.shape[1]))
-    #     K[0,:,:] = I
-    #     K[1,:,:] = J
-    #     tifwrite(np.uint8(255*K),'/home/mc457/Workspace/Sinem_NucSeg%d.tif' % (i+1))
-    # UNet2D.singleImageInferenceCleanup()
-
-
-    # ----- test 2 -----
-
-    # imPath = '/home/mc457/files/CellBiology/IDAC/Marcelo/Etc/UNetTestSets/ClarenceYapp_NucleiSegmentation'
-    # UNet2D.setup(128,1,2,8,2,2,3,1,0.1,3,4)
-    # UNet2D.train(imPath,logPath,modelPath,pmPath,800,100,100,False,10,1)
-    # UNet2D.deploy(imPath,100,modelPath,pmPath,1)
-
-
-    # ----- test 3 -----
-
-    # imPath = '/home/mc457/files/CellBiology/IDAC/Marcelo/Etc/UNetTestSets/CarmanLi_CellTypeSegmentation'
-    # # UNet2D.setup(256,1,2,8,2,2,3,1,0.1,3,4)
-    # # UNet2D.train(imPath,logPath,modelPath,pmPath,1400,100,164,False,10000,1)
-    # UNet2D.deploy(imPath,164,modelPath,pmPath,1)
-
-
-    # ----- test 4 -----
-
-    # imPath = '/home/mc457/files/CellBiology/IDAC/Marcelo/Etc/UNetTestSets/GopalanGnanaguru_CellSegmentation'
-    # # UNet2D.setup(256,1,2,8,2,2,3,1,0.1,5,8) # imSize,nChannels,nClasses,nOut0,featMapsFact,downSampFact,kernelSize,nExtraConvs,stdDev0,nDownSampLayers,batchSize
-    # # UNet2D.train(imPath,logPath,modelPath,pmPath,350,50,15,True,1000,0,0) # imPath,logPath,modelPath,pmPath,nTrain,nValid,nTest,restoreVariables,nSteps,gpuIndex,testPMIndex
-    # # UNet2D.deploy(imPath,50,modelPath,pmPath,0,0) # imPath,nImages,modelPath,pmPath,gpuIndex,pmIndex
-
-    # UNet2D.singleImageInferenceSetup(modelPath,0)
-    # for i in range(3):
-    #     print(i)
-    #     I = im2double(tifread('/home/mc457/files/CellBiology/IDAC/Marcelo/Etc/UNetTestSets/GopalanGnanaguru_CellSegmentation_SingleImageInferenceTest%d.tif' % (i+1)))
-    #     J = UNet2D.singleImageInference(I,'accumulate',0)
-    #     K = np.zeros((2,I.shape[0],I.shape[1]))
-    #     K[0,:,:] = I
-    #     K[1,:,:] = J
-    #     tifwrite(np.uint8(255*K),'/home/mc457/Workspace/Gopalan_CellSeg%d.tif' % (i+1))
-    # UNet2D.singleImageInferenceCleanup()
-
-    # ----- test 5 -----
-
-    # imPath = '/home/mc457/files/CellBiology/IDAC/Marcelo/Etc/UNetTestSets/ClarenceYapp_CellBoundarySegmentation'
-    # UNet2D.setup(256,1,2,8,2,2,3,1,0.1,5,8) # imSize,nChannels,nClasses,nOut0,featMapsFact,downSampFact,kernelSize,nExtraConvs,stdDev0,nDownSampLayers,batchSize
-    # UNet2D.train(imPath,logPath,modelPath,pmPath,390,50,8,True,1000,0,0) # imPath,logPath,modelPath,pmPath,nTrain,nValid,nTest,restoreVariables,nSteps,gpuIndex,testPMIndex
-    # UNet2D.deploy(imPath,50,modelPath,pmPath,0,0) # imPath,nImages,modelPath,pmPath,gpuIndex,pmIndex
+    tifwrite(np.uint8(255*K),'/home/mc457/Workspace/UNetData_Sinem/SingleImageInferenceTest_NucPM.tif')
