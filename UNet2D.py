@@ -71,16 +71,16 @@ class UNet2D:
                 for i in range(nExtraConvs):
                     ldXWeightsExtra.append(tf.Variable(tf.truncated_normal([UNet2D.hp['ks'], UNet2D.hp['ks'], nOutX[index+1], nOutX[index+1]], stddev=stdDev0),name='kernelExtra%d' % i))
                 
-                c00 = tf.nn.conv2d(data, ldXWeights1, strides=[1, 1, 1, 1], padding='SAME')
+                c00 = tf.layers.batch_normalization(tf.nn.conv2d(data, ldXWeights1, strides=[1, 1, 1, 1], padding='SAME'), training=UNet2D.tfTraining)
                 for i in range(nExtraConvs):
-                    c00 = tf.nn.conv2d(tf.nn.relu(c00), ldXWeightsExtra[i], strides=[1, 1, 1, 1], padding='SAME')
+                    c00 = tf.layers.batch_normalization(tf.nn.conv2d(tf.nn.relu(c00), ldXWeightsExtra[i], strides=[1, 1, 1, 1], padding='SAME'), training=UNet2D.tfTraining)
 
                 ldXWeightsShortcut = tf.Variable(tf.truncated_normal([1, 1, nOutX[index], nOutX[index+1]], stddev=stdDev0),name='shortcutWeights')
                 shortcut = tf.nn.conv2d(data, ldXWeightsShortcut, strides=[1, 1, 1, 1], padding='SAME')
+                preMaxPool = tf.nn.relu(c00+shortcut)
+                # preMaxPool = tf.nn.relu(c00)
 
-                bn = tf.layers.batch_normalization(tf.nn.relu(c00+shortcut), training=UNet2D.tfTraining)
-
-                return tf.nn.max_pool(bn, ksize=[1, dsfX[index], dsfX[index], 1], strides=[1, dsfX[index], dsfX[index], 1], padding='SAME',name='maxpool')
+                return tf.nn.max_pool(preMaxPool, ksize=[1, dsfX[index], dsfX[index], 1], strides=[1, dsfX[index], dsfX[index], 1], padding='SAME',name='maxpool')
 
         # --------------------------------------------------
         # bottom layer
@@ -89,7 +89,7 @@ class UNet2D:
         with tf.name_scope('lb'):
             lbWeights1 = tf.Variable(tf.truncated_normal([UNet2D.hp['ks'], UNet2D.hp['ks'], nOutX[UNet2D.hp['nLayers']], nOutX[UNet2D.hp['nLayers']+1]], stddev=stdDev0),name='kernel1')
             def lb(hidden):
-                return tf.nn.relu(tf.nn.conv2d(hidden, lbWeights1, strides=[1, 1, 1, 1], padding='SAME'),name='conv')
+                return tf.nn.relu(tf.layers.batch_normalization(tf.nn.conv2d(hidden, lbWeights1, strides=[1, 1, 1, 1], padding='SAME'), training=UNet2D.tfTraining),name='conv')
 
         # --------------------------------------------------
         # downsampling
@@ -122,12 +122,12 @@ class UNet2D:
                 outSize = int(outSize)
 
                 outputShape = [UNet2D.hp['batchSize'],outSize,outSize,nOutX[index+1]]
-                us = tf.nn.relu(tf.nn.conv2d_transpose(data, luXWeights1, outputShape, strides=[1, dsfX[index], dsfX[index], 1], padding='SAME'),name='conv1')
+                us = tf.nn.conv2d_transpose(data, luXWeights1, outputShape, strides=[1, dsfX[index], dsfX[index], 1], padding='SAME')
                 cc = concat3([dsX[index],us]) 
-                cv = tf.nn.relu(tf.nn.conv2d(cc, luXWeights2, strides=[1, 1, 1, 1], padding='SAME'),name='conv2')
+                cv = tf.layers.batch_normalization(tf.nn.conv2d(cc, luXWeights2, strides=[1, 1, 1, 1], padding='SAME'), training=UNet2D.tfTraining)
                 for i in range(nExtraConvs):
-                    cv = tf.nn.relu(tf.nn.conv2d(cv, luXWeightsExtra[i], strides=[1, 1, 1, 1], padding='SAME'),name='conv2Extra%d' % i)
-                return cv
+                    cv = tf.layers.batch_normalization(tf.nn.conv2d(cv, luXWeightsExtra[i], strides=[1, 1, 1, 1], padding='SAME'), training=UNet2D.tfTraining)
+                return tf.nn.relu(cv)
 
         # --------------------------------------------------
         # final (top) layer
@@ -510,14 +510,17 @@ if __name__ == '__main__':
     logPath = '/home/mc457/Workspace/TFLog/UNet2D'
     modelPath = '/home/mc457/Workspace/UNetData_Sinem/TFModel/UNet2D_Sinem'
     pmPath = '/home/mc457/Workspace/TFProbMaps/UNet2D'
-
+    imPath = '/home/mc457/Workspace/UNetData_Sinem/TrainingData/NucleiSegmentation'
 
     # -------------------------
-    # train/test
-
-    # imPath = '/home/mc457/Workspace/UNetData_Sinem/TrainingData/NucleiSegmentation'
+    # train
+    
     # UNet2D.setup(128,1,2,8,2,2,3,1,0.1,2,8)
     # UNet2D.train(imPath,logPath,modelPath,pmPath,500,100,40,False,20000,1,0)
+
+    # -------------------------
+    # test
+    
     # UNet2D.deploy(imPath,100,modelPath,pmPath,1,0)
 
 
